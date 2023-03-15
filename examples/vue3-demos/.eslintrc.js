@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['soybeanjs-vue'],
+  extends: ['soybeanjs/vue'],
   settings: {
     'import/core-modules': ['uno.css']
   }

@@ -2,6 +2,10 @@
   "name": "@soybeanjs/materials",
   "version": "0.1.9",
   "private": true,
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=3"
+  },
   "description": "SoybeanJS's component materials, include Vue, React，Solid and Svelte",
   "author": {
     "name": "SoybeanJS",
@@ -24,6 +28,7 @@
     "format": "soy prettier-format",
     "commit": "soy git-commit",
     "cleanup": "soy cleanup",
+    "cleanup:deep": "soy cleanup-deep",
     "update-pkg": "soy update-pkg",
     "init-git": "soy init-git-hooks",
     "tsx": "tsx",
