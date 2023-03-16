@@ -4,8 +4,8 @@
   "description": "vue2 and vue3 components material",
   "author": "Soybean <honghuangdc@gmail.com> (https://github.com/honghuangdc)",
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
@@ -20,6 +20,7 @@
     "test3": "vue-demi-switch 3"
   },
   "dependencies": {
+    "@vueuse/core": "^9.13.0",
     "colord": "^2.9.3",
     "vue-demi": "^0.13.11"
   },

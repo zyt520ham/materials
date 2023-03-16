@@ -32,8 +32,10 @@
         <div class="card">Footer</div>
       </div>
     </template>
-    <div>
-      <div v-for="i in 50" :key="i" class="bg-#ddd">{{ i }}</div>
+    <div class="w-full h-full">
+      <div class="w-1/2 h-full overflow-auto">
+        <div v-for="i in 50" :key="i" class="bg-#ddd">{{ i }}</div>
+      </div>
     </div>
   </admin-layout>
   <div class="fixed right-0 top-120px h-480px overflow-auto px-12px whitespace-nowrap">

@@ -1,0 +1,17 @@
+.drag-bar-view {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    width: 2px;
+    height: 100%;
+    cursor: col-resize;
+    border-top: none;
+    border-bottom: none;
+}
+.drag-bar-view--hide {
+    display: none;
+}
+.drag-bar-view:hover {
+    background-color: greenyellow;
+    box-shadow: 0 0 4px 0 #1b233626;
+}

@@ -1,4 +1,4 @@
-import { defineComponent, computed } from 'vue-demi';
+import { defineComponent, computed, ref } from 'vue-demi';
 import type { PropType } from 'vue-demi';
 import { initProps, getStrategyResult } from '../../shared';
 import { createCssVars, type CssVarsProps } from './css-vars';
@@ -10,6 +10,8 @@ import LayoutFooter from './layout-footer';
 import style from './layout.module.css';
 import type { LayoutProps, LayoutMode, ScrollMode } from './types';
 
+import LayoutDragview from './layout-dragview';
+import { useDragLine } from './hooks/useDragLine';
 /** 布局组件的滚动元素id默认值 */
 const SCROLL_EL_ID = '__SCROLL_EL_ID__';
 
@@ -121,7 +123,7 @@ const AdminLayout = defineComponent<LayoutProps>({
       default: false
     }
   }),
-  setup(props, { slots }) {
+  setup(props, { slots, emit }) {
     const cssVars = computed(() => {
       const {
         mode,
@@ -195,6 +197,23 @@ const AdminLayout = defineComponent<LayoutProps>({
       return cls;
     });
 
+    const dragBarRef = ref();
+    const siderRef = ref();
+
+    useDragLine(
+      siderRef,
+      dragBarRef,
+      computed(() => {
+        return {
+          collapse: props.siderCollapse
+        };
+      }),
+      (vDragWith: number) => {
+        // dragWidth.value = vDragWith;
+        cssVars.value['--soy-sider-width'] = vDragWith;
+        emit('updateSiderWithEvent', vDragWith);
+      }
+    );
     return () => (
       <div class={[':soy: relative h-full', props.commonClass]} style={{ ...cssVars.value }}>
         <div
@@ -223,12 +242,14 @@ const AdminLayout = defineComponent<LayoutProps>({
             {slots.tab?.()}
           </LayoutTab>
           <LayoutSider
+            ref={'siderRef'}
             visible={props.siderVisible}
             class={[props.commonClass, props.siderClass, siderPaddingClass.value]}
             hide={props.fullContent}
             collapse={props.siderCollapse}
           >
             {slots.sider?.()}
+            <LayoutDragview ref={'dragBarRef'} />
           </LayoutSider>
 
           <LayoutContent
