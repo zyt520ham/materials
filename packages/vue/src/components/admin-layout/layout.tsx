@@ -124,6 +124,7 @@ const AdminLayout = defineComponent<LayoutProps>({
       default: false
     }
   }),
+
   setup(props, { slots, emit }) {
     const getInitCssVars = () => {
       const {
@@ -155,8 +156,8 @@ const AdminLayout = defineComponent<LayoutProps>({
 
       return createCssVars(cssProps);
     };
-    const initVars = getInitCssVars();
-    const cssVarsRef = ref<CssVars>(initVars);
+
+    const cssVarsRef = ref<CssVars>(getInitCssVars());
     const cssVars = computed<CssVars>(() => {
       return cssVarsRef.value;
     });
@@ -205,18 +206,31 @@ const AdminLayout = defineComponent<LayoutProps>({
 
     const dragBarRef = ref();
     const siderRef = ref();
+    const propsSiderWidthRef = ref(props.siderWidth);
     useDragLine(
       siderRef,
       dragBarRef,
       computed(() => {
         return {
+          collapsedWidth: props.siderCollapsedWidth,
           collapse: props.siderCollapse
         };
       }),
       (vDragWith: number) => {
         // dragWidth.value = vDragWith;
         console.log('dragWidth', vDragWith);
-
+        if (vDragWith <= props.siderCollapsedWidth!) {
+          console.log('拖拽到了最小值');
+          // 设置不折叠
+          emit('update:sider-collapse', true);
+          propsSiderWidthRef.value = props.siderWidth;
+          emit('update:siderWidth', props.siderWidth);
+          cssVarsRef.value = updateCssVars(cssVars.value, { siderWidth: props.siderWidth });
+          console.log('cssVars 恢复初始', cssVars.value);
+          return;
+        }
+        propsSiderWidthRef.value = vDragWith;
+        emit('update:siderWidth', vDragWith);
         cssVarsRef.value = updateCssVars(cssVars.value, { siderWidth: vDragWith });
         console.log('cssVars', cssVars.value);
         // cssVars.value['--soy-sider-width'] = vDragWith;
@@ -227,13 +241,7 @@ const AdminLayout = defineComponent<LayoutProps>({
     onMounted(() => {
       console.log('layout onMounted', dragBarRef.value);
     });
-    const tempSiderWidthRef = ref<number>(props.siderWidth || 0);
-    const btnClick = () => {
-      console.log('btnClick');
-      tempSiderWidthRef.value += 5;
-      cssVarsRef.value = updateCssVars(cssVars.value, { siderWidth: tempSiderWidthRef.value });
-      console.log('cssVars', cssVars.value);
-    };
+
     return () => (
       <div class={[':soy: relative h-full', props.commonClass]} style={{ ...cssVars.value }}>
         <div
@@ -269,7 +277,7 @@ const AdminLayout = defineComponent<LayoutProps>({
             ref={siderRef}
           >
             {slots.sider?.()}
-            <LayoutDragview hide={props.siderCollapse} ref={dragBarRef} leftWidth={props.siderWidth} />
+            <LayoutDragview hide={props.siderCollapse} ref={dragBarRef} leftWidth={propsSiderWidthRef.value} />
           </LayoutSider>
 
           <LayoutContent
@@ -277,8 +285,7 @@ const AdminLayout = defineComponent<LayoutProps>({
             overScroll={isContentScroll.value}
             class={[props.commonClass, props.contentClass, leftGapClass.value]}
           >
-            <button onClick={btnClick}>addBtn</button>
-            {/* {slots.default?.()} */}
+            {slots.default?.()}
           </LayoutContent>
           <LayoutFooter
             visible={props.footerVisible}

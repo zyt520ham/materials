@@ -6,7 +6,7 @@
     :header-visible="headerVisible"
     :tab-visible="tabVisible"
     :sider-visible="siderVisible"
-    :sider-collapse="siderCollapse"
+    v-model:sider-collapse="siderCollapse"
     :full-content="full"
     :footer-visible="footerVisible"
     :fixed-footer="fixedFooter"
@@ -131,7 +131,7 @@ const { bool: siderVisible, toggle: toggleSiderVisible } = useBoolean(true);
 const { bool: footerVisible, toggle: toggleFooterVisible } = useBoolean(true);
 const { bool: fixedTop, toggle: togglefixedTop } = useBoolean(true);
 const { bool: fixedFooter, toggle: toggleFixedFooter } = useBoolean(true);
-const { bool: siderCollapse, toggle: toggleSiderCollapse } = useBoolean(true);
+const { bool: siderCollapse,setBool:siderCollapseSetter, toggle: toggleSiderCollapse } = useBoolean(true);
 const { bool: rightFooter, toggle: toggleRightFooter } = useBoolean();
 const { bool: full, toggle: toggleFull } = useBoolean();
 

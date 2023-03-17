@@ -1,28 +1,27 @@
 import type { Component, ComputedRef, Ref } from 'vue-demi';
 import { nextTick, onMounted, unref } from 'vue-demi';
-import type { SiderProps } from '@/components/admin-layout/types';
 import { useDebounceFn } from '@vueuse/core';
+// eslint-disable-next-line max-params
 export function useDragLine(
   siderRef: Ref<any>,
   dragBarRef: Ref<any>,
   props: ComputedRef<{
-    /** 是否折叠 */
-    collapse?: boolean;
+    collapsedWidth?: number;
   }>,
-  dragFinishCb?: (width: number) => void,
-  mix = false
+  dragFinishCb?: (width: number) => void
 ) {
-  const getMiniWidthNumber = 80;
-  const getCollapsed = props.value.collapse;
+  const getMiniWidthNumber = props.value.collapsedWidth;
 
   const setMenuSetting = (params: any) => {
     console.log('setMenuSetting', params);
 
     if (params.menuWidth > 0) {
+      // eslint-disable-next-line no-unused-expressions
       dragFinishCb && dragFinishCb(params.menuWidth);
       // dragWidth.value = params.menuWidth;
     } else {
-      dragFinishCb && dragFinishCb(getMiniWidthNumber);
+      // eslint-disable-next-line no-unused-expressions
+      dragFinishCb && dragFinishCb(getMiniWidthNumber!);
       // dragWidth.value = getMiniWidthNumber;
     }
   };
@@ -38,10 +37,10 @@ export function useDragLine(
     // debugger
     if (!el) return null;
     if (Reflect.has(el, '$el')) {
-      return (unref(elRef) as Component)?.$el;
+      return (unref(elRef) as any)?.$el;
     }
     if (Reflect.has(el, '$contentEl')) {
-      return (unref(elRef) as Component)?.$contentEl;
+      return (unref(elRef) as any)?.$contentEl;
     }
     return unref(elRef);
   }
@@ -49,13 +48,17 @@ export function useDragLine(
   function handleMouseMove(ele: HTMLElement, wrap: HTMLElement, clientX: number) {
     console.log('handleMouseMove');
     document.onmousemove = innerE => {
-      let iT = (ele as any).left + (innerE.clientX - clientX);
-      innerE = innerE || window.event;
+      let iT: number = (ele as any).left + (innerE.clientX - clientX);
+      // innerE = innerE || window.event;
       const maxT = 800;
-      const minT = unref(getMiniWidthNumber);
+      const minT = getMiniWidthNumber!;
+      // eslint-disable-next-line no-unused-expressions
       iT < 0 && (iT = 0);
+      // eslint-disable-next-line no-unused-expressions
       iT > maxT && (iT = maxT);
+      // eslint-disable-next-line no-unused-expressions
       iT < minT && (iT = minT);
+      // eslint-disable-next-line no-unused-expressions,no-multi-assign
       ele.style.left = wrap.style.width = `${iT}px`;
       return false;
     };
@@ -68,18 +71,10 @@ export function useDragLine(
       document.onmousemove = null;
       document.onmouseup = null;
       wrap.style.transition = 'width 0.2s';
-      const width = parseInt(wrap.style.width);
-
-      if (!mix) {
-        const miniWidth = unref(getMiniWidthNumber);
-        if (!unref(getCollapsed)) {
-          width > miniWidth + 20 ? setMenuSetting({ menuWidth: width }) : setMenuSetting({ collapsed: true });
-        } else {
-          width > miniWidth && setMenuSetting({ collapsed: false, menuWidth: width });
-        }
-      } else {
-        setMenuSetting({ menuWidth: width });
-      }
+      const width = parseInt(wrap.style.width, 10);
+      setMenuSetting({ menuWidth: width });
+      // 将内置样式移除
+      wrap.style = {};
 
       ele.releaseCapture?.();
     };
