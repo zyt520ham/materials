@@ -17,8 +17,7 @@ const DragView = defineComponent({
     const getDragBarStyle = computed(() => {
       if (props.leftWidth >= 0) {
         return {
-          left: `${props.leftWidth}px`,
-          'background-color': 'red'
+          left: `${props.leftWidth}px`
         };
       }
       return {};
@@ -28,7 +27,7 @@ const DragView = defineComponent({
       contextEl
     });
     onMounted(() => {
-      console.log('dragview onmounted', getCurrentInstance());
+      // console.log('dragview onmounted', getCurrentInstance());
       contextEl.value = getCurrentInstance()?.vnode.el as any;
     });
 

@@ -12,6 +12,7 @@
     :footer-visible="footerVisible"
     :fixed-footer="fixedFooter"
     :right-footer="rightFooter"
+    :sider-drag="useSiderDrag"
   >
     <template v-if="headerVisible" #header>
       <div class="h-full p-2px">
@@ -128,7 +129,7 @@
                     </n-form-item>
                     <n-form-item label="slder 拖拽" :show-feedback="false">
                       <div class="text-center w-full">
-                        <n-switch v-model:value="useSlderDrag"> </n-switch>
+                        <n-switch v-model:value="useSiderDrag"> </n-switch>
                       </div>
                     </n-form-item>
                   </n-form>
@@ -246,7 +247,7 @@ const { bool: siderCollapse, toggle: toggleSiderCollapse } = useBoolean(true);
 const { bool: rightFooter, toggle: toggleRightFooter } = useBoolean();
 const { bool: fullWindowMain, toggle: toggleFull } = useBoolean();
 const { bool: useOpacity } = useBoolean(true);
-const { bool: useSlderDrag } = useBoolean(true);
+const { bool: useSiderDrag } = useBoolean(true);
 const siderNoCollapseWidthRef = ref(240);
 function scrollEl() {
   const dom = document.querySelector(`#${SCROLL_EL_ID}`);

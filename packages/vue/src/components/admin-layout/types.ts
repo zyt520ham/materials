@@ -176,6 +176,8 @@ export interface LayoutProps extends HeaderConfig, TabConfig, SiderConfig, Conte
   fixedTop?: boolean;
   /** Header,Tab,Sider和Footer的zIndex取值不超过该值 */
   maxZIndex?: number;
+  /** sider使用拖拽 */
+  siderDrag?: boolean;
 }
 
 /** 布局组件各部分的通用属性 */

@@ -122,6 +122,10 @@ const AdminLayout = defineComponent<LayoutProps>({
     rightFooter: {
       type: Boolean,
       default: false
+    },
+    siderDrag: {
+      type: Boolean,
+      default: true
     }
   }),
 
@@ -161,7 +165,7 @@ const AdminLayout = defineComponent<LayoutProps>({
     const cssVars = computed<CssVars>(() => {
       return cssVarsRef.value;
     });
-    console.log('cssVars', cssVars);
+    // console.log('cssVars', cssVars);
     const isWrapperScroll = computed(() => props.scrollMode === 'wrapper');
     const isContentScroll = computed(() => props.scrollMode === 'content');
 
@@ -218,28 +222,26 @@ const AdminLayout = defineComponent<LayoutProps>({
       }),
       (vDragWith: number) => {
         // dragWidth.value = vDragWith;
-        console.log('dragWidth', vDragWith);
+        // console.log('dragWidth', vDragWith);
         if (vDragWith <= props.siderCollapsedWidth!) {
-          console.log('拖拽到了最小值');
+          // console.log('拖拽到了最小值');
           // 设置不折叠
           emit('update:sider-collapse', true);
           propsSiderWidthRef.value = props.siderWidth;
           emit('update:siderWidth', props.siderWidth);
           cssVarsRef.value = updateCssVars(cssVars.value, { siderWidth: props.siderWidth });
-          console.log('cssVars 恢复初始', cssVars.value);
+          // console.log('cssVars 恢复初始', cssVars.value);
           return;
         }
         propsSiderWidthRef.value = vDragWith;
         emit('update:siderWidth', vDragWith);
         cssVarsRef.value = updateCssVars(cssVars.value, { siderWidth: vDragWith });
-        console.log('cssVars', cssVars.value);
-        // cssVars.value['--soy-sider-width'] = vDragWith;
-        // emit('updateSiderWithEvent', vDragWith);
+        // console.log('cssVars', cssVars.value);
       }
     );
 
     onMounted(() => {
-      console.log('layout onMounted', dragBarRef.value);
+      // console.log('layout onMounted', dragBarRef.value);
     });
 
     return () => (
@@ -277,7 +279,11 @@ const AdminLayout = defineComponent<LayoutProps>({
             ref={siderRef}
           >
             {slots.sider?.()}
-            <LayoutDragview hide={props.siderCollapse} ref={dragBarRef} leftWidth={propsSiderWidthRef.value} />
+            <LayoutDragview
+              hide={props.siderCollapse || props.siderDrag === false}
+              ref={dragBarRef}
+              leftWidth={propsSiderWidthRef.value}
+            />
           </LayoutSider>
 
           <LayoutContent

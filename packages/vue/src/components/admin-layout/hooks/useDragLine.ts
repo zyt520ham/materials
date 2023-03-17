@@ -13,7 +13,7 @@ export function useDragLine(
   const getMiniWidthNumber = props.value.collapsedWidth;
 
   const setMenuSetting = (params: any) => {
-    console.log('setMenuSetting', params);
+    // console.log('setMenuSetting', params);
 
     if (params.menuWidth > 0) {
       // eslint-disable-next-line no-unused-expressions
