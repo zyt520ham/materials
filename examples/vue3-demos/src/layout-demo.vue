@@ -1,12 +1,13 @@
 <template>
   <admin-layout
+    v-model:sider-collapse="siderCollapse"
+    v-model:sider-width="siderNoCollapseWidthRef"
     :mode="layoutMode"
     :scroll-mode="scrollMode"
     :fixed-top="fixedTop"
     :header-visible="headerVisible"
     :tab-visible="tabVisible"
     :sider-visible="siderVisible"
-    v-model:sider-collapse="siderCollapse"
     :full-content="full"
     :footer-visible="footerVisible"
     :fixed-footer="fixedFooter"
@@ -14,31 +15,54 @@
   >
     <template v-if="headerVisible" #header>
       <div class="h-full p-2px">
-        <div class="card">Header</div>
+        <div :class="[{ 'use-opacity': useOpacity }]" class="card head-slot">Header插槽</div>
       </div>
     </template>
     <template #tab>
       <div class="h-full p-2px">
-        <div class="card">Tab</div>
+        <div :class="[{ 'use-opacity': useOpacity }]" class="card tab-slot">Tab插槽</div>
       </div>
     </template>
     <template #sider>
       <div class="h-full p-2px">
-        <div class="card">Sider</div>
+        <div :class="[{ 'use-opacity': useOpacity }]" class="card sider-slot">
+          <div class="block">
+            <div>Sider</div>
+            <br />
+            <div>侧边栏插槽</div>
+          </div>
+        </div>
       </div>
     </template>
     <template #footer>
       <div class="h-full p-2px">
-        <div class="card">Footer</div>
+        <div :class="[{ 'use-opacity': useOpacity }]" class="card foot-slot">Footer插槽</div>
       </div>
     </template>
-    <div class="w-full h-full">
-      <div class="w-1/2 h-full overflow-auto">
-        <div v-for="i in 50" :key="i" class="bg-#ddd">{{ i }}</div>
+    <template #default>
+      <div class="p-2px card main-slot">
+        <div class="w-full h-full">
+          <div class="flex flex-row justify-between justify-items-center h-full">
+            <div class="flex-none w-200px h-full content-center self-center p-2px main-inner">
+              <div class="flex flex-col justify-center h-full">
+                <span class="justify-self-center">黄色区域为main区域</span>
+              </div>
+            </div>
+            <div class="w-100px h-full overflow-auto text-center p-2px main-inner">
+              <div v-for="i in 50" :key="i">{{ i }}</div>
+            </div>
+            <div class="flex-none w-200px text-center p-2px main-inner">
+              <div class="flex flex-col justify-center h-full">
+                <span class="justify-self-center">layout控制开关</span>
+                <div></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </template>
   </admin-layout>
-  <div class="fixed right-0 top-120px h-480px overflow-auto px-12px whitespace-nowrap">
+  <div class="hidden fixed right-0 top-120px h-480px overflow-auto px-12px whitespace-nowrap">
     <div class="font-bold">layoutMode:</div>
     <div v-for="item in layoutModeList" :key="item">
       <span class="pr-8px">{{ item }}</span>
@@ -131,10 +155,11 @@ const { bool: siderVisible, toggle: toggleSiderVisible } = useBoolean(true);
 const { bool: footerVisible, toggle: toggleFooterVisible } = useBoolean(true);
 const { bool: fixedTop, toggle: togglefixedTop } = useBoolean(true);
 const { bool: fixedFooter, toggle: toggleFixedFooter } = useBoolean(true);
-const { bool: siderCollapse,setBool:siderCollapseSetter, toggle: toggleSiderCollapse } = useBoolean(true);
+const { bool: siderCollapse, toggle: toggleSiderCollapse } = useBoolean(true);
 const { bool: rightFooter, toggle: toggleRightFooter } = useBoolean();
 const { bool: full, toggle: toggleFull } = useBoolean();
-
+const { bool: useOpacity } = useBoolean(true);
+const siderNoCollapseWidthRef = ref(240);
 function scrollEl() {
   const dom = document.querySelector(`#${SCROLL_EL_ID}`);
   dom?.scrollTo({ top: 100, behavior: 'smooth' });
@@ -142,7 +167,28 @@ function scrollEl() {
 </script>
 
 <style scoped>
+.head-slot {
+  @apply b-1px b-solid b-#34fa37 bg-#34fa37;
+}
+.tab-slot {
+  @apply b-1px b-solid b-#fa8734 bg-#E06F1EFF;
+}
+.sider-slot {
+  @apply b-1px b-solid b-#34ccfa bg-#34ccfa;
+}
+.foot-slot {
+  @apply b-1px b-solid b-#34fa37 bg-#34fa37;
+}
+.main-slot {
+  @apply b-1px b-solid b-#DDE34AFF bg-#DDE34AFF;
+}
+.main-inner {
+  @apply b-1px b-solid b-#EAC508FF bg-#EAC508FF  rd-4px;
+}
 .card {
-  @apply flex-center h-full b-1px b-solid b-#3491FA bg-#3491FA bg-opacity-20% rd-4px;
+  @apply flex-center h-full   rd-4px;
+}
+.use-opacity {
+  @apply bg-opacity-20%;
 }
 </style>
