@@ -1,7 +1,8 @@
-import { defineComponent, computed, ref } from 'vue-demi';
+import { defineComponent, computed, ref, onMounted } from 'vue-demi';
 import type { PropType } from 'vue-demi';
 import { initProps, getStrategyResult } from '../../shared';
-import { createCssVars, type CssVarsProps } from './css-vars';
+import { createCssVars, updateCssVars } from './css-vars';
+import type { CssVars, CssVarsProps } from './css-vars';
 import LayoutHeader from './layout-header';
 import LayoutTab from './layout-tab';
 import LayoutSider from './layout-sider';
@@ -124,7 +125,7 @@ const AdminLayout = defineComponent<LayoutProps>({
     }
   }),
   setup(props, { slots, emit }) {
-    const cssVars = computed(() => {
+    const getInitCssVars = () => {
       const {
         mode,
         maxZIndex = MAX_Z_INDEX,
@@ -153,8 +154,13 @@ const AdminLayout = defineComponent<LayoutProps>({
       };
 
       return createCssVars(cssProps);
+    };
+    const initVars = getInitCssVars();
+    const cssVarsRef = ref<CssVars>(initVars);
+    const cssVars = computed<CssVars>(() => {
+      return cssVarsRef.value;
     });
-
+    console.log('cssVars', cssVars);
     const isWrapperScroll = computed(() => props.scrollMode === 'wrapper');
     const isContentScroll = computed(() => props.scrollMode === 'content');
 
@@ -199,7 +205,6 @@ const AdminLayout = defineComponent<LayoutProps>({
 
     const dragBarRef = ref();
     const siderRef = ref();
-
     useDragLine(
       siderRef,
       dragBarRef,
@@ -210,10 +215,25 @@ const AdminLayout = defineComponent<LayoutProps>({
       }),
       (vDragWith: number) => {
         // dragWidth.value = vDragWith;
-        cssVars.value['--soy-sider-width'] = vDragWith;
-        emit('updateSiderWithEvent', vDragWith);
+        console.log('dragWidth', vDragWith);
+
+        cssVarsRef.value = updateCssVars(cssVars.value, { siderWidth: vDragWith });
+        console.log('cssVars', cssVars.value);
+        // cssVars.value['--soy-sider-width'] = vDragWith;
+        // emit('updateSiderWithEvent', vDragWith);
       }
     );
+
+    onMounted(() => {
+      console.log('layout onMounted', dragBarRef.value);
+    });
+    const tempSiderWidthRef = ref<number>(props.siderWidth || 0);
+    const btnClick = () => {
+      console.log('btnClick');
+      tempSiderWidthRef.value += 5;
+      cssVarsRef.value = updateCssVars(cssVars.value, { siderWidth: tempSiderWidthRef.value });
+      console.log('cssVars', cssVars.value);
+    };
     return () => (
       <div class={[':soy: relative h-full', props.commonClass]} style={{ ...cssVars.value }}>
         <div
@@ -242,14 +262,14 @@ const AdminLayout = defineComponent<LayoutProps>({
             {slots.tab?.()}
           </LayoutTab>
           <LayoutSider
-            ref={'siderRef'}
             visible={props.siderVisible}
             class={[props.commonClass, props.siderClass, siderPaddingClass.value]}
             hide={props.fullContent}
             collapse={props.siderCollapse}
+            ref={siderRef}
           >
             {slots.sider?.()}
-            <LayoutDragview ref={'dragBarRef'} />
+            <LayoutDragview hide={props.siderCollapse} ref={dragBarRef} leftWidth={props.siderWidth} />
           </LayoutSider>
 
           <LayoutContent
@@ -257,7 +277,8 @@ const AdminLayout = defineComponent<LayoutProps>({
             overScroll={isContentScroll.value}
             class={[props.commonClass, props.contentClass, leftGapClass.value]}
           >
-            {slots.default?.()}
+            <button onClick={btnClick}>addBtn</button>
+            {/* {slots.default?.()} */}
           </LayoutContent>
           <LayoutFooter
             visible={props.footerVisible}

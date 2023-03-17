@@ -5,7 +5,10 @@ import { useDebounceFn } from '@vueuse/core';
 export function useDragLine(
   siderRef: Ref<any>,
   dragBarRef: Ref<any>,
-  props: ComputedRef<Required<SiderProps>>,
+  props: ComputedRef<{
+    /** 是否折叠 */
+    collapse?: boolean;
+  }>,
   dragFinishCb?: (width: number) => void,
   mix = false
 ) {
@@ -32,6 +35,7 @@ export function useDragLine(
 
   function getEl(elRef: Ref<Element | Component>): any {
     const el = unref(elRef);
+    // debugger
     if (!el) return null;
     if (Reflect.has(el, '$el')) {
       return (unref(elRef) as Component)?.$el;
@@ -82,8 +86,9 @@ export function useDragLine(
   }
 
   function changeWrapWidth() {
+    console.log('changeWrapWidth');
     const ele = getEl(dragBarRef);
-    if (!ele) return;
+
     const wrap = getEl(siderRef);
     if (!wrap) return;
 
