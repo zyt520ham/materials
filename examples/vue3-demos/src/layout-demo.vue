@@ -8,7 +8,7 @@
     :header-visible="headerVisible"
     :tab-visible="tabVisible"
     :sider-visible="siderVisible"
-    :full-content="full"
+    :full-content="fullWindowMain"
     :footer-visible="footerVisible"
     :fixed-footer="fixedFooter"
     :right-footer="rightFooter"
@@ -44,17 +44,95 @@
         <div class="w-full h-full">
           <div class="flex flex-row justify-between justify-items-center h-full">
             <div class="flex-none w-200px h-full content-center self-center p-2px main-inner">
-              <div class="flex flex-col justify-center h-full">
+              <div class="flex flex-col justify-center h-full text-center">
                 <span class="justify-self-center">黄色区域为main区域</span>
               </div>
             </div>
             <div class="w-100px h-full overflow-auto text-center p-2px main-inner">
               <div v-for="i in 50" :key="i">{{ i }}</div>
             </div>
-            <div class="flex-none w-200px text-center p-2px main-inner">
+            <div class="flex-none w-250px text-center p-2px main-inner">
               <div class="flex flex-col justify-center h-full">
                 <span class="justify-self-center">layout控制开关</span>
-                <div></div>
+                <div>
+                  <n-form-item label="布局方式" :show-feedback="false">
+                    <div class="text-center w-full">
+                      <n-radio-group v-model:value="layoutMode">
+                        <n-space>
+                          <n-radio v-for="mode in layoutModeList" :key="mode.value" :value="mode.value">
+                            {{ mode.label }}
+                          </n-radio>
+                        </n-space>
+                      </n-radio-group>
+                    </div>
+                  </n-form-item>
+                  <n-form label-placement="left" label-width="auto">
+                    <n-form-item label="是否显示Footer" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="footerVisible"></n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="是否显示Tab" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="tabVisible"></n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="是否显示Sider" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="siderVisible"></n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="fixedTop" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="fixedTop"></n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="fixedFooter" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="fixedFooter"></n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="sider折叠" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="siderCollapse"></n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="main slots全屏" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="fullWindowMain">
+                          <template #checked> 全屏 </template>
+                          <template #unchecked> 取消全屏 </template>
+                        </n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="main 滚动方式" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-radio-group v-model:value="scrollMode" name="radiogroup">
+                          <n-space>
+                            <n-radio v-for="mode in scrollModeList" :key="mode" :value="mode">
+                              {{ mode }}
+                            </n-radio>
+                          </n-space>
+                        </n-radio-group>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="foot right" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="rightFooter"> </n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="是否开启半透明" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="useOpacity"> </n-switch>
+                      </div>
+                    </n-form-item>
+                    <n-form-item label="slder 拖拽" :show-feedback="false">
+                      <div class="text-center w-full">
+                        <n-switch v-model:value="useSlderDrag"> </n-switch>
+                      </div>
+                    </n-form-item>
+                  </n-form>
+                </div>
               </div>
             </div>
           </div>
@@ -138,7 +216,16 @@ import { AdminLayout, SCROLL_EL_ID } from '@soybeanjs/vue-materials';
 import type { LayoutMode, ScrollMode } from '@soybeanjs/vue-materials';
 
 const layoutMode = ref<LayoutMode>('vertical');
-const layoutModeList: LayoutMode[] = ['vertical', 'horizontal'];
+const layoutModeList: { label: string; value: LayoutMode }[] = [
+  {
+    label: '水平',
+    value: 'horizontal'
+  },
+  {
+    label: '竖直',
+    value: 'vertical'
+  }
+];
 function setLayoutMode(value: LayoutMode) {
   layoutMode.value = value;
 }
@@ -157,8 +244,9 @@ const { bool: fixedTop, toggle: togglefixedTop } = useBoolean(true);
 const { bool: fixedFooter, toggle: toggleFixedFooter } = useBoolean(true);
 const { bool: siderCollapse, toggle: toggleSiderCollapse } = useBoolean(true);
 const { bool: rightFooter, toggle: toggleRightFooter } = useBoolean();
-const { bool: full, toggle: toggleFull } = useBoolean();
+const { bool: fullWindowMain, toggle: toggleFull } = useBoolean();
 const { bool: useOpacity } = useBoolean(true);
+const { bool: useSlderDrag } = useBoolean(true);
 const siderNoCollapseWidthRef = ref(240);
 function scrollEl() {
   const dom = document.querySelector(`#${SCROLL_EL_ID}`);
