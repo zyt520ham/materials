@@ -1,7 +1,7 @@
 /**
  * 头部配置
  */
-export interface HeaderConfig {
+interface HeaderConfig {
   /**
    * 头部可见
    * @default true
@@ -22,7 +22,7 @@ export interface HeaderConfig {
 /**
  * Tab页签配置
  */
-export interface TabConfig {
+interface TabConfig {
   /**
    * Tab页签可见
    * @default true
@@ -43,7 +43,7 @@ export interface TabConfig {
 /**
  * 侧边栏配置
  */
-export interface SiderConfig {
+interface SiderConfig {
   /**
    * 侧边栏可见
    * @default true
@@ -54,6 +54,11 @@ export interface SiderConfig {
    * @default ''
    */
   siderClass?: string;
+  /**
+   * 移动端的侧边栏样式名
+   * @default ''
+   */
+  mobileSiderClass?: string;
   /**
    * 侧边栏折叠状态
    * @default false
@@ -134,7 +139,7 @@ export type LayoutMode = 'horizontal' | 'vertical';
 export type ScrollMode = 'wrapper' | 'content';
 
 /**
- * 布局的属性
+ * 布局组件的属性
  */
 export interface LayoutProps extends HeaderConfig, TabConfig, SiderConfig, ContentConfig, FooterConfig {
   /**
@@ -142,6 +147,8 @@ export interface LayoutProps extends HeaderConfig, TabConfig, SiderConfig, Conte
    * - {@link LayoutMode}
    */
   mode?: LayoutMode;
+  /** 是否是移动端 */
+  isMobile?: boolean;
   /**
    * 内容溢出时的出现滚动条的方式
    * - {@link ScrollMode}
@@ -178,54 +185,4 @@ export interface LayoutProps extends HeaderConfig, TabConfig, SiderConfig, Conte
   maxZIndex?: number;
   /** sider使用拖拽 */
   siderDrag?: boolean;
-}
-
-/** 布局组件各部分的通用属性 */
-interface CommonProps {
-  /** 是否可见 */
-  visible?: boolean;
-  /** 样式的类名 */
-  class?: string | (string | Record<string, boolean> | undefined)[];
-  /** 是否隐藏(display: none) */
-  hide?: boolean;
-}
-
-/**
- * 头部组件的属性
- */
-export interface HeaderProps extends CommonProps {
-  /** 是否固定 */
-  fixed?: boolean;
-}
-
-/**
- * Tab组件组件的属性
- */
-export interface TabProps extends CommonProps {
-  /** 是否固定 */
-  fixed?: boolean;
-}
-
-/** 侧边栏组件属性 */
-export interface SiderProps extends CommonProps {
-  /** 是否折叠 */
-  collapse?: boolean;
-}
-
-/** 主体内容组件的属性 */
-export interface ContentProps {
-  /** 滚动元素的id */
-  scrollId?: string;
-  /** 内容溢出是否滚动 */
-  overScroll?: boolean;
-  /** 样式的类名 */
-  class?: CommonProps['class'];
-}
-
-/**
- * 底部组件组件的属性
- */
-export interface FooterProps extends CommonProps {
-  /** 是否固定 */
-  fixed?: boolean;
 }

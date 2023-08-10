@@ -1,6 +1,6 @@
 {
   "name": "@soybeanjs/materials",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "private": true,
   "engines": {
     "node": ">=16",
@@ -8,7 +8,7 @@
   },
   "description": "SoybeanJS's component materials, include Vue, React，Solid and Svelte",
   "author": {
-    "name": "SoybeanJS",
+    "name": "Soybean",
     "email": "honghuangdc@gmail.com",
     "url": "https://github.com/soybeanjs"
   },
@@ -24,7 +24,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "lint": "eslint . --fix --ext .ts,.tsx,.vue",
+    "lint": "eslint . --fix",
     "format": "soy prettier-format",
     "commit": "soy git-commit",
     "cleanup": "soy cleanup",
@@ -32,27 +32,22 @@
     "update-pkg": "soy update-pkg",
     "init-git": "soy init-git-hooks",
     "tsx": "tsx",
-    "update-version": "bumpp package.json packages/*/package.json",
     "publish-pkg": "pnpm -r publish --access public",
-    "release": "pnpm update-version && pnpm publish-pkg",
+    "release": "soy release",
     "prepare": "pnpm -r run stub"
   },
   "devDependencies": {
-    "@soybeanjs/cli": "^0.1.7",
-    "bumpp": "^9.0.0",
-    "eslint": "^8.36.0",
-    "eslint-config-soybeanjs": "^0.3.1",
-    "lint-staged": "13.2.0",
-    "simple-git-hooks": "^2.8.1",
-    "tsup": "^6.6.3",
-    "tsx": "^3.12.4",
-    "typescript": "4.9.5"
+    "@soybeanjs/cli": "0.5.0",
+    "eslint": "8.42.0",
+    "eslint-config-soybeanjs": "0.4.8",
+    "simple-git-hooks": "2.8.1",
+    "tsup": "6.7.0",
+    "tsx": "3.12.7",
+    "typescript": "5.1.3"
   },
   "simple-git-hooks": {
-    "commit-msg": "pnpm soybean git-commit-verify",
-    "pre-commit": "pnpm lint && pnpm lint-staged"
+    "commit-msg": "pnpm soy git-commit-verify",
+    "pre-commit": "pnpm soy lint-staged"
   },
-  "lint-staged": {
-    "*.{ts,tsx,vue}": "eslint . --fix"
-  }
+  "github-token": "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"
 }

@@ -30,20 +30,4 @@ export interface TabProps {
   activeColor?: string;
   /** 是否显示关闭图标 */
   closable?: boolean;
-  /** 点击关闭图标 */
-  onClose?: () => void;
-}
-
-interface CommonProps {
-  style?: Record<string, string | number>;
-  /** 样式的类名 */
-  class?: string | (string | Record<string, boolean> | undefined)[];
-}
-
-export interface ButtonTabProps extends CommonProps, TabProps {}
-
-export interface ChromeTabProps extends CommonProps, TabProps {}
-
-export interface IconCloseProps extends Pick<CommonProps, 'class'> {
-  onClose?: () => void;
 }
