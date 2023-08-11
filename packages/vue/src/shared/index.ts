@@ -1,3 +1,11 @@
+/*
+ * @Description:
+ * @Author: Gavin
+ * @Date: 2023-08-10 15:54:54
+ * @LastEditors: Gavin
+ * @LastEditTime: 2023-08-11 13:15:22
+ * @FilePath: /soybean-materials/packages/vue/src/shared/index.ts
+ */
 import type { App, Component } from 'vue';
 import { colord, extend } from 'colord';
 import type { RgbColor } from 'colord';
@@ -52,4 +60,15 @@ export function transformColorWithOpacity(color: string, alpha: number, bgColor 
   };
 
   return colord(resultRgb).toHex();
+}
+
+export function parseCssValueToNumberFn(cssValue: string | number): number {
+  if (isNumber(cssValue)) {
+    return cssValue;
+  }
+  return Number((cssValue as string).replace('px', ''));
+}
+
+function isNumber(val: unknown): val is number {
+  return Object.prototype.toString.call(val) === '[object Number]';
 }

@@ -1,19 +1,17 @@
 <template>
-  <admin-layout
-    v-model:sider-collapse="siderCollapse"
-    v-model:sider-width="siderNoCollapseWidthRef"
+  <admin-layout 
+    v-model:sider-collapse="siderCollapse"      
+    v-model:sider-width="siderNoCollapseWidthRef" 
     :mode="layoutMode"
-    :scroll-mode="scrollMode"
-    :fixed-top="fixedTop"
+    :is-mobile="isMobile" 
+    :scroll-mode="scrollMode" 
+    :fixed-top="fixedTop" 
     :header-visible="headerVisible"
-    :tab-visible="tabVisible"
-    :sider-visible="siderVisible"
-    :full-content="fullWindowMain"
-    :footer-visible="footerVisible"
-    :fixed-footer="fixedFooter"
-    :right-footer="rightFooter"
-    :sider-drag="useSiderDrag"
-  >
+    header-class="py-16px pr-16px" :header-height="88" :tab-visible="tabVisible" tab-class="pb-16px pr-16px"
+    :tab-height="64" :sider-visible="siderVisible" sider-class="p-16px" :full-content="fullWindowMain"
+    :footer-visible="footerVisible" :fixed-footer="fixedFooter" :right-footer="rightFooter" footer-class="py-16px pr-16px"
+    :footer-height="80" :sider-drag="useSiderDrag" @click-mobile-sider-mask="layoutMobileSiderMaskFn"
+    >
     <template v-if="headerVisible" #header>
       <div class="h-full p-2px">
         <div :class="[{ 'use-opacity': useOpacity }]" class="card head-slot">Header插槽</div>
@@ -56,6 +54,11 @@
               <div class="flex flex-col justify-center h-full">
                 <span class="justify-self-center">layout控制开关</span>
                 <div>
+                  <n-form-item label="手机模式" :show-feedback="false">
+                    <div class="text-center w-full">
+                      <n-switch v-model:value="isMobile"></n-switch>
+                    </div>
+                  </n-form-item>
                   <n-form-item label="布局方式" :show-feedback="false">
                     <div class="text-center w-full">
                       <n-radio-group v-model:value="layoutMode">
@@ -141,71 +144,7 @@
       </div>
     </template>
   </admin-layout>
-  <div class="hidden fixed right-0 top-120px h-480px overflow-auto px-12px whitespace-nowrap">
-    <div class="font-bold">layoutMode:</div>
-    <div v-for="item in layoutModeList" :key="item">
-      <span class="pr-8px">{{ item }}</span>
-      <input
-        type="radio"
-        name="layoutMode"
-        :value="item"
-        :checked="item === layoutMode"
-        class="cursor-pointer"
-        @change="setLayoutMode(item)"
-      />
-    </div>
-    <div class="font-bold">scrollMode:</div>
-    <div v-for="item in scrollModeList" :key="item">
-      <span class="pr-8px">{{ item }}</span>
-      <input
-        type="radio"
-        name="scrollMode"
-        :value="item"
-        :checked="item === scrollMode"
-        class="cursor-pointer"
-        @change="setScrollMode(item)"
-      />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">headerVisible</span>
-      <input class="cursor-pointer" type="checkbox" :checked="headerVisible" @change="toggleHeaderVisible" />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">tabVisible</span>
-      <input class="cursor-pointer" type="checkbox" :checked="tabVisible" @change="toggleTabVisible" />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">siderVisible</span>
-      <input class="cursor-pointer" type="checkbox" :checked="siderVisible" @change="toggleSiderVisible" />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">footerVisible</span>
-      <input class="cursor-pointer" type="checkbox" :checked="footerVisible" @change="toggleFooterVisible" />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">fixedTop</span>
-      <input class="cursor-pointer" type="checkbox" :checked="fixedTop" @change="togglefixedTop" />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">fixedFooter</span>
-      <input class="cursor-pointer" type="checkbox" :checked="fixedFooter" @change="toggleFixedFooter" />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">siderCollapse</span>
-      <input class="cursor-pointer" type="checkbox" :checked="siderCollapse" @change="toggleSiderCollapse" />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">rightFooter</span>
-      <input class="cursor-pointer" type="checkbox" :checked="rightFooter" @change="toggleRightFooter" />
-    </div>
-    <div class="pt-24px">
-      <span class="pr-8px">full content</span>
-      <input class="cursor-pointer" type="checkbox" :checked="full" @change="toggleFull" />
-    </div>
-    <div class="pt-24px">
-      <button @click="scrollEl">滚动</button>
-    </div>
-  </div>
+
   <!-- </div> -->
 </template>
 
@@ -213,7 +152,7 @@
 import { ref } from 'vue';
 import { useBoolean } from './hooks';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { AdminLayout, SCROLL_EL_ID } from '@soybeanjs/vue-materials';
+import { AdminLayout, LAYOUT_SCROLL_EL_ID } from '@soybeanjs/vue-materials';
 import type { LayoutMode, ScrollMode } from '@soybeanjs/vue-materials';
 
 const layoutMode = ref<LayoutMode>('vertical');
@@ -236,7 +175,8 @@ const scrollModeList: ScrollMode[] = ['wrapper', 'content'];
 function setScrollMode(value: ScrollMode) {
   scrollMode.value = value;
 }
-
+// isMobile
+const { bool: isMobile, toggle: toggleMobileOrPc } = useBoolean(false);
 const { bool: headerVisible, toggle: toggleHeaderVisible } = useBoolean(true);
 const { bool: tabVisible, toggle: toggleTabVisible } = useBoolean(true);
 const { bool: siderVisible, toggle: toggleSiderVisible } = useBoolean(true);
@@ -253,30 +193,42 @@ function scrollEl() {
   const dom = document.querySelector(`#${SCROLL_EL_ID}`);
   dom?.scrollTo({ top: 100, behavior: 'smooth' });
 }
+
+const layoutMobileSiderMaskFn = () => {
+  console.log("layoutMobileSiderMaskFn");
+  toggleSiderCollapse()
+}
 </script>
 
 <style scoped>
 .head-slot {
   @apply b-1px b-solid b-#34fa37 bg-#34fa37;
 }
+
 .tab-slot {
   @apply b-1px b-solid b-#fa8734 bg-#E06F1EFF;
 }
+
 .sider-slot {
   @apply b-1px b-solid b-#34ccfa bg-#34ccfa;
 }
+
 .foot-slot {
   @apply b-1px b-solid b-#34fa37 bg-#34fa37;
 }
+
 .main-slot {
   @apply b-1px b-solid b-#DDE34AFF bg-#DDE34AFF;
 }
+
 .main-inner {
-  @apply b-1px b-solid b-#EAC508FF bg-#EAC508FF  rd-4px;
+  @apply b-1px b-solid b-#EAC508FF bg-#EAC508FF rd-4px;
 }
+
 .card {
-  @apply flex-center h-full   rd-4px;
+  @apply flex-center h-full rd-4px;
 }
+
 .use-opacity {
   @apply bg-opacity-20%;
 }

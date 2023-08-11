@@ -56,15 +56,23 @@
       <template v-if="showSider">
         <aside
           v-show="!fullContent"
+          :style="!siderCollapseRef ? { width: siderWidthRef + 'px' } : {}"
           :class="[
             ':soy: absolute left-0 top-0 h-full',
             commonClass,
             siderClass,
             siderPaddingClass,
-            siderCollapse ? style['layout-sider_collapsed'] : style['layout-sider']
+            siderCollapseRef ? style['layout-sider_collapsed'] : style['layout-sider']
           ]"
         >
           <slot name="sider"></slot>
+          <div
+            :style="{ display: !siderCollapseRef && siderDrag ? 'block ' : 'none' }"
+            class="drag-handle"
+            @mousedown="startResizeFn"
+          >
+            <div class="resize-line" :style="{ display: isResizingRef ? 'block' : 'none' }"></div>
+          </div>
         </aside>
       </template>
 
@@ -127,10 +135,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch, ref } from 'vue';
 import type { LayoutProps } from './types';
-import { LAYOUT_SCROLL_EL_ID, LAYOUT_MAX_Z_INDEX, createLayoutCssVars } from './shared';
+import {
+  LAYOUT_SCROLL_EL_ID,
+  LAYOUT_MAX_Z_INDEX,
+  createLayoutCssVars,
+  useDragHelper,
+  updateLayoutCssVars,
+  LAYOUR_SIDER_WIDTH
+} from './shared';
 import style from './index.module.css';
+
+import { parseCssValueToNumberFn } from '../../shared';
 
 defineOptions({
   name: 'AdminLayout'
@@ -138,6 +155,7 @@ defineOptions({
 
 const props = withDefaults(defineProps<LayoutProps>(), {
   mode: 'vertical',
+  isMobile: false,
   scrollMode: 'content',
   scrollElId: LAYOUT_SCROLL_EL_ID,
   commonClass: 'transition-all-300',
@@ -149,16 +167,20 @@ const props = withDefaults(defineProps<LayoutProps>(), {
   tabHeight: 48,
   siderVisible: true,
   siderCollapse: false,
-  siderWidth: 220,
+  siderWidth: LAYOUR_SIDER_WIDTH,
   siderCollapsedWidth: 64,
   footerVisible: true,
   footerHeight: 48,
-  rightFooter: false
+  rightFooter: false,
+  siderDrag: true
 });
+const { targetViewWidthRef, startResizeFn, isResizingRef } = useDragHelper(props.siderWidth);
 
 interface Emits {
   /** 点击移动端模式下的蒙层 */
   (e: 'click-mobile-sider-mask'): void;
+  (e: 'update:siderWidth', siderWidth: number): void;
+  (e: 'update:siderCollapse', siderCollapse: boolean): void;
 }
 
 const emit = defineEmits<Emits>();
@@ -179,8 +201,26 @@ type Slots = {
 };
 const slots = defineSlots<Slots>();
 
+const cssVarsObjInnder = createLayoutCssVars(props);
+const siderWidthRef = computed({
+  get: () => {
+    return props.siderWidth;
+  },
+  set: nV => {
+    emit('update:siderWidth', nV);
+  }
+});
+// const siderCollapseRef = ref(props.siderCollapse);
+const siderCollapseRef = computed({
+  set: nV => {
+    emit('update:siderCollapse', nV);
+  },
+  get: () => {
+    return props.siderCollapse;
+  }
+});
 /** CSS 变量 */
-const cssVars = computed(() => createLayoutCssVars(props));
+const cssVars = computed(() => cssVarsObjInnder);
 
 // 各部分的可见性
 const showHeader = computed(() => Boolean(slots.header) && props.headerVisible);
@@ -238,8 +278,51 @@ const siderPaddingClass = computed(() => {
 });
 
 function handleClickMask() {
+  console.log('handleClickMask');
   emit('click-mobile-sider-mask');
 }
+
+// #region drag about
+watch(
+  () => targetViewWidthRef.value,
+  nV => {
+    // console.log('watch width', nV);
+    if (nV <= (parseCssValueToNumberFn(cssVars.value['--soy-sider-collapsed-width']!) || 80)) {
+      siderWidthRef.value = LAYOUR_SIDER_WIDTH;
+      targetViewWidthRef.value = LAYOUR_SIDER_WIDTH;
+      siderCollapseRef.value = true;
+      // nV = defaultSiderWidth;
+      updateLayoutCssVars(cssVarsObjInnder, '--soy-sider-width', `${siderWidthRef.value}px`);
+      // emit('update:siderCollapse', siderCollapseRef.value);
+      // emit('update:siderWidth', siderWidthRef.value);
+    } else {
+      siderWidthRef.value = nV;
+      updateLayoutCssVars(cssVarsObjInnder, '--soy-sider-width', `${siderWidthRef.value}px`);
+      // emit('update:siderWidth', siderWidthRef.value);
+    }
+    // console.log('cssVars', cssVars.value);
+  }
+);
+// #endregion
 </script>
 
-<style scoped></style>
+<style scoped>
+.drag-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  cursor: ew-resize;
+}
+
+.resize-line {
+  position: relative;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background-color: blue;
+}
+</style>

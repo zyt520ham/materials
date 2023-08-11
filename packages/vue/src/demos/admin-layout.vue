@@ -14,6 +14,7 @@
       :sider-visible="siderVisible"
       sider-class="p-16px"
       :sider-collapse="siderCollapse"
+      :sider-width="240"
       :sider-collapsed-width="96"
       :full-content="full"
       :footer-visible="footerVisible"
