@@ -3,7 +3,7 @@
  * @Author: Gavin
  * @Date: 2023-08-10 15:54:54
  * @LastEditors: Gavin
- * @LastEditTime: 2023-08-11 13:17:20
+ * @LastEditTime: 2023-08-11 19:03:46
  * @FilePath: /soybean-materials/packages/vue/src/libs/admin-layout/shared.ts
  */
 import { ref } from 'vue-demi';
@@ -97,9 +97,17 @@ export function createLayoutCssVars(props: LayoutProps) {
 export function useDragHelper(vTargetOriWidth: number) {
   const targetViewWidthRef = ref(vTargetOriWidth);
   const isResizing = ref(false);
+  let animationFrameId = 0;
   const resize = (event: MouseEvent) => {
     if (!isResizing.value) return;
-    targetViewWidthRef.value = event.clientX;
+    // 取消上一个 requestAnimationFrame
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+    // 使用 requestAnimationFrame 进行性能优化
+    animationFrameId = requestAnimationFrame(() => {
+      targetViewWidthRef.value = event.clientX;
+    });
   };
 
   const stopResize = () => {
